@@ -40,6 +40,16 @@
             background: linear-gradient(145deg, #3b2a5e, #2a1b4a);
             border-color: #c4b5fd;
         }
+
+        @media (max-width: 640px) {
+            .card, .plus-card {
+                aspect-ratio: 1 / 1.1;
+            }
+            .modal-content {
+                margin: 1rem;
+                max-height: 95vh;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen text-purple-100 pb-12">
@@ -83,7 +93,7 @@
         </header>
 
         <!-- Grid de Manifestações -->
-        <div id="gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-12">
+        <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 sm:gap-6 mt-10">
             <!-- Cards serão inseridos via JS -->
         </div>
     </div>
