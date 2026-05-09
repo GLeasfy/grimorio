@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grimório das Manifestações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500&display=swap');
+        
+        body {
+            background: radial-gradient(circle at center, #1a0f2e 0%, #0a0a0a 70%);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .title-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        .card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(145deg, #1f1238, #120a22);
+            border: 1px solid #6b46c0;
+        }
+        
+        .card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
+            border-color: #a78bfa;
+        }
+
+        .plus-card {
+            background: linear-gradient(145deg, #2a1b4a, #1a1033);
+            border: 2px dashed #8b5cf6;
+        }
+
+        .plus-card:hover {
+            background: linear-gradient(145deg, #3b2a5e, #2a1b4a);
+            border-color: #c4b5fd;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-purple-100 pb-12">
+    <div class="max-w-7xl mx-auto px-6">
+        <!-- Cabeçalho -->
+        <header class="flex items-center justify-between py-10 border-b border-purple-900/50">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/50">
+                    <i class="fa-solid fa-moon text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="title-font text-5xl tracking-widest text-white">GRIMÓRIO</h1>
+                    <p class="text-purple-400 text-sm tracking-[3px] -mt-1">DAS MANIFESTAÇÕES</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-3xl border border-purple-800">
+                    <i class="fa-solid fa-sparkles text-amber-400"></i>
+                    <span id="count" class="font-medium">0 manifestações</span>
+                </div>
+
+                <button onclick="exportGrimorio()" 
+                        class="px-5 py-2.5 bg-purple-950 hover:bg-purple-900 text-purple-300 rounded-3xl text-sm flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Exportar</span>
+                </button>
+
+                <button onclick="importGrimorio()" 
+                        class="px-5 py-2.5 bg-purple-950 hover:bg-purple-900 text-purple-300 rounded-3xl text-sm flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Importar</span>
+                </button>
+
+                <button onclick="clearAll()" 
+                        class="px-5 py-2.5 bg-red-950 hover:bg-red-900 text-red-300 rounded-3xl text-sm flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-trash"></i>
+                    <span>Limpar Tudo</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Grid de Manifestações -->
+        <div id="gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-12">
+            <!-- Cards serão inseridos via JS -->
+        </div>
+    </div>
+
+    <!-- Modal de Nova Manifestação -->
+    <div id="newModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
+        <div class="modal bg-[#1a1033] border border-purple-700 rounded-3xl w-full max-w-lg mx-4 overflow-hidden">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="title-font text-3xl text-white">Nova Manifestação</h2>
+                    <button onclick="closeNewModal()" class="text-purple-400 hover:text-white text-2xl">✕</button>
+                </div>
+                
+                <input id="titleInput" 
+                       type="text" 
+                       placeholder="Título da manifestação (opcional)"
+                       class="w-full bg-black/50 border border-purple-700 focus:border-purple-400 rounded-2xl px-5 py-4 text-lg outline-none mb-4">
+                
+                <textarea id="contentInput" rows="8"
+                          placeholder="Escreva sua manifestação aqui...&#10;Que o Universo a ouça."
+                          class="w-full bg-black/50 border border-purple-700 focus:border-purple-400 rounded-3xl px-5 py-4 outline-none resize-none"></textarea>
+                
+                <div class="flex gap-3 mt-8">
+                    <button onclick="closeNewModal()" 
+                            class="flex-1 py-4 rounded-3xl border border-purple-700 hover:bg-purple-950 text-purple-300">
+                        Cancelar
+                    </button>
+                    <button onclick="saveManifestation()" 
+                            class="flex-1 py-4 rounded-3xl bg-gradient-to-r from-purple-600 to-violet-600 hover:brightness-110 font-medium">
+                        Manifestar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Visualização -->
+    <div id="viewModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50">
+        <div class="modal bg-[#1a1033] border border-purple-700 rounded-3xl w-full max-w-lg mx-4 overflow-hidden">
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 id="viewTitle" class="title-font text-3xl text-white"></h2>
+                        <p id="viewDate" class="text-purple-400 text-sm mt-1"></p>
+                    </div>
+                    <button onclick="closeViewModal()" class="text-purple-400 hover:text-white text-2xl">✕</button>
+                </div>
+                
+                <div id="viewContent" class="prose prose-invert text-purple-100 leading-relaxed text-lg whitespace-pre-wrap min-h-[200px]">
+                </div>
+                
+                <div class="flex gap-3 mt-10">
+                    <button onclick="deleteCurrent()" 
+                            class="flex-1 py-4 rounded-3xl border border-red-700 hover:bg-red-950 text-red-300 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-trash"></i>
+                        Excluir
+                    </button>
+                    <button onclick="closeViewModal()" 
+                            class="flex-1 py-4 rounded-3xl bg-purple-900 hover:bg-purple-800">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração Tailwind
+        function initTailwind() {
+            // Já está carregado via CDN
+        }
+
+        let manifestations = [];
+        let currentViewId = null;
+
+        // Carregar do localStorage
+        function loadManifestations() {
+            const saved = localStorage.getItem('manifestations');
+            if (saved) {
+                manifestations = JSON.parse(saved);
+            }
+            renderGallery();
+        }
+
+        // Salvar no localStorage
+        function saveToStorage() {
+            localStorage.setItem('manifestations', JSON.stringify(manifestations));
+        }
+
+        // Renderizar galeria
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            
+            // Card de +
+            const plusHTML = `
+                <div onclick="openNewModal()" class="plus-card aspect-square rounded-3xl flex flex-col items-center justify-center cursor-pointer group">
+                    <div class="w-16 h-16 rounded-2xl border-2 border-dashed border-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-plus text-4xl text-purple-300"></i>
+                    </div>
+                    <p class="mt-6 text-purple-400 text-sm tracking-widest">NOVA MANIFESTAÇÃO</p>
+                </div>
+            `;
+            gallery.innerHTML += plusHTML;
+            
+            manifestations.forEach((item, index) => {
+                const cardHTML = `
+                    <div onclick="viewManifestation(${index})" class="card aspect-square rounded-3xl p-6 flex flex-col cursor-pointer overflow-hidden relative group">
+                        <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all">
+                            <button onclick="event.stopImmediatePropagation(); deleteManifestation(${index});" 
+                                    class="w-8 h-8 bg-black/70 hover:bg-red-900 rounded-2xl flex items-center justify-center text-red-400 hover:text-red-300">
+                                <i class="fa-solid fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="text-amber-300 text-xs mb-2">${new Date(item.date).toLocaleDateString('pt-BR', {day:'numeric', month:'short'})}</div>
+                        
+                        ${item.title ? `<h3 class="text-xl font-medium text-white mb-3 line-clamp-2">${item.title}</h3>` : ''}
+                        
+                        <p class="text-purple-200 line-clamp-5 flex-1">${item.content}</p>
+                        
+                        <div class="mt-auto pt-4 border-t border-purple-900/50 text-[10px] text-purple-500 flex items-center gap-1">
+                            <i class="fa-solid fa-scroll"></i>
+                            <span>Manifestado</span>
+                        </div>
+                    </div>
+                `;
+                gallery.innerHTML += cardHTML;
+            });
+            
+            document.getElementById('count').textContent = `${manifestations.length} manifestações`;
+        }
+
+        function openNewModal() {
+            document.getElementById('titleInput').value = '';
+            document.getElementById('contentInput').value = '';
+            document.getElementById('newModal').classList.remove('hidden');
+            document.getElementById('contentInput').focus();
+        }
+
+        function closeNewModal() {
+            document.getElementById('newModal').classList.add('hidden');
+        }
+
+        function saveManifestation() {
+            const title = document.getElementById('titleInput').value.trim();
+            const content = document.getElementById('contentInput').value.trim();
+            
+            if (!content) {
+                alert("Escreva sua manifestação antes de salvá-la.");
+                return;
+            }
+            
+            manifestations.unshift({
+                id: Date.now(),
+                title: title,
+                content: content,
+                date: new Date().toISOString()
+            });
+            
+            saveToStorage();
+            renderGallery();
+            closeNewModal();
+        }
+
+        function viewManifestation(index) {
+            currentViewId = index;
+            const item = manifestations[index];
+            
+            document.getElementById('viewTitle').textContent = item.title || "Manifestação";
+            document.getElementById('viewDate').textContent = `Manifestada em ${new Date(item.date).toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}`;
+            document.getElementById('viewContent').textContent = item.content;
+            
+            document.getElementById('viewModal').classList.remove('hidden');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.add('hidden');
+        }
+
+        function deleteManifestation(index) {
+            if (confirm("Tem certeza que deseja excluir esta manifestação?")) {
+                manifestations.splice(index, 1);
+                saveToStorage();
+                renderGallery();
+            }
+        }
+
+        function deleteCurrent() {
+            if (currentViewId !== null && confirm("Excluir esta manifestação?")) {
+                manifestations.splice(currentViewId, 1);
+                saveToStorage();
+                renderGallery();
+                closeViewModal();
+            }
+        }
+
+        function clearAll() {
+            if (confirm("⚠️ Isso vai excluir TODAS as manifestações. Tem certeza?")) {
+                manifestations = [];
+                saveToStorage();
+                renderGallery();
+            }
+        }
+
+        // ==================== EXPORTAR ====================
+        function exportGrimorio() {
+            if (manifestations.length === 0) {
+                alert("Seu Grimório ainda está vazio.");
+                return;
+            }
+
+            const dataStr = JSON.stringify(manifestations, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', `grimorio_${new Date().toISOString().slice(0,10)}.json`);
+            link.click();
+        }
+
+        // ==================== IMPORTAR ====================
+        function importGrimorio() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        
+                        if (!Array.isArray(imported)) {
+                            alert("❌ Arquivo inválido. O arquivo deve ser um backup do Grimório.");
+                            return;
+                        }
+
+                        if (imported.length === 0) {
+                            alert("O arquivo está vazio.");
+                            return;
+                        }
+
+                        const confirmText = `Deseja importar ${imported.length} manifestações?\n\nIsso substituirá todas as atuais.`;
+                        
+                        if (confirm(confirmText)) {
+                            manifestations = imported;
+                            saveToStorage();
+                            renderGallery();
+                            alert("✅ Grimório importado com sucesso!");
+                        }
+                    } catch (err) {
+                        alert("❌ Erro ao ler o arquivo. Certifique-se de que é um arquivo .json válido.");
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Criar estrelas de fundo
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.style.position = 'absolute';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.background = 'white';
+                star.style.borderRadius = '50%';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.opacity = Math.random() * 0.6 + 0.3;
+                star.style.animation = `twinkle ${Math.random() * 4 + 3}s infinite`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Adicionar keyframes para twinkling
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes twinkle {
+                0%, 100% { opacity: 0.3; }
+                50% { opacity: 0.9; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Inicialização
+        window.onload = function() {
+            loadManifestations();
+            createStars();
+            
+            // Atalho de teclado
+            document.addEventListener('keydown', function(e) {
+                if (e.key === "Escape") {
+                    const newModal = document.getElementById('newModal');
+                    const viewModal = document.getElementById('viewModal');
+                    if (!newModal.classList.contains('hidden')) closeNewModal();
+                    else if (!viewModal.classList.contains('hidden')) closeViewModal();
+                }
+                
+                if (e.key === "+" || e.key === "=") {
+                    const newModal = document.getElementById('newModal');
+                    if (newModal.classList.contains('hidden')) openNewModal();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
