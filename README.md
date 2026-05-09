@@ -1,5 +1,6 @@
 <div align="center":
   <h1>🌙 Grimório das Manifestações</h1>
+  
   <p><strong>Um espaço sagrado digital para registrar suas manifestações</strong></p>
   
   <p>
@@ -11,7 +12,7 @@
 
 ---
 
-## ✨ Sobre o Projeto
+## ✨
 
 O **Grimório das Manifestações** é um caderno digital com uma estética mística e imersiva. 
 
@@ -36,16 +37,6 @@ Aqui você pode registrar suas intenções, orações, gratidões, afirmações 
 5. Suas intenções ficarão guardadas para sempre
 
 > **Dica:** Use o botão **Exportar** periodicamente para fazer backup do seu grimório.
-
----
-
-## 🛠️ Tecnologias Utilizadas
-
-- HTML5 + CSS3 + Vanilla JavaScript
-- Tailwind CSS (via CDN)
-- Fontes: Cinzel (títulos) e Inter (texto)
-- Font Awesome Icons
-- localStorage para persistência
 
 ---
 
